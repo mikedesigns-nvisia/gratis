@@ -7,9 +7,9 @@ const scale = (ratio: number) => Math.round(BASE_FONT_SIZE * ratio);
 export const typography = {
   // Font families
   fontFamily: {
-    primary: 'Inter-Regular', // Primary font
-    secondary: 'Inter-Medium', // Medium weight
-    bold: 'Inter-Bold', // Bold weight
+    primary: 'System', // Primary font
+    secondary: 'System-Medium', // Medium weight
+    bold: 'System-Bold', // Bold weight
   },
   
   // Font sizes using golden ratio

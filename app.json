@@ -35,6 +35,14 @@
     "plugins": [
       "expo-asset",
       "expo-font"
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
   }
 }

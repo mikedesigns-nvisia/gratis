@@ -5,16 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 import { useTheme } from '../theme/provider';
 import { GratitudePrompt } from '../components/composite';
-import { saveEntry, getEntryById, Entry } from '../storage/localStorage';
-// Custom UUID generator for React Native environments without crypto
-const generateUUID = (): string => {
-  // Simple implementation that works without crypto
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
+import { saveEntry, getEntryById, Entry, generateUUID } from '../storage/localStorage';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Entry'>;
 type EntryScreenRouteProp = RouteProp<RootStackParamList, 'Entry'>;
