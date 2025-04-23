@@ -60,7 +60,9 @@
     "extra": {
       "eas": {
         "projectId": "your-project-id"
-      }
+      },
+      "supabaseUrl": "https://qfngomisykdiyhsznzts.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbmdvbWlzeWtkaXloc3puenRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ5MTkyMjQsImV4cCI6MjA2MDQ5NTIyNH0.ADvCDlEC7No99xfOXdLz-LGxo-yORK0wT4JrItQgnFg"
     }
   }
 }
