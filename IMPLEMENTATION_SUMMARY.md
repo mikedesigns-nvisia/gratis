@@ -4,6 +4,16 @@
 
 We have successfully integrated Supabase cloud synchronization into the Gratis app. This implementation allows users to create accounts using magic link authentication and sync their gratitude entries across devices.
 
+## Environment Configuration
+
+The implementation supports multiple ways to provide Supabase credentials:
+
+1. **Environment variables** via `.env` file (for local development)
+2. **Expo config** in `app.json` (for production)
+3. **Hard-coded values** as a fallback (not recommended)
+
+This approach provides flexibility for different development and deployment scenarios.
+
 ## Key Components Implemented
 
 1. **Authentication**

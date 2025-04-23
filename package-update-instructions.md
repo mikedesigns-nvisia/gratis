@@ -3,7 +3,7 @@
 To complete the Supabase cloud sync integration, you need to install some additional packages. Run the following command in your project directory:
 
 ```bash
-npm install @react-native-community/netinfo react-native-url-polyfill expo-linking expo-web-browser
+npm install @react-native-community/netinfo react-native-url-polyfill expo-linking expo-web-browser expo-constants
 ```
 
 ## Dependencies Added
@@ -14,6 +14,7 @@ These are the dependencies needed for the Supabase cloud sync functionality:
 2. **react-native-url-polyfill**: Required by Supabase for React Native compatibility
 3. **expo-linking**: Handles deep links for magic link authentication
 4. **expo-web-browser**: Used for opening authentication links
+5. **expo-constants**: Accesses environment variables and app configuration
 
 ## TypeScript Type Definitions
 

@@ -15,10 +15,23 @@ The Gratis app now includes cloud synchronization capabilities using Supabase as
 
 ### 1. Supabase Project Setup
 
-The app is already configured with a Supabase project. If you need to use a different project:
+The app is configured with a Supabase project. There are three ways to provide your Supabase credentials:
 
-1. Update the Supabase URL and anon key in `src/services/supabase.ts`
-2. Ensure you have set up the database schema by running the SQL script in `supabase/migrations/create_tables.sql`
+1. **Environment variables (recommended for local development)**:
+   - Create a `.env` file in the root of your project with:
+     ```
+     EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+     EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+     ```
+
+2. **Expo config (app.json) - recommended for production**:
+   - The credentials are already in `app.json` under `expo.extra`
+   - Update these values if you're using a different Supabase project
+
+3. **Directly in code (not recommended)**:
+   - You can hardcode values in `src/services/supabase.ts` if needed
+   
+Don't forget to set up the database schema by running the SQL script in `supabase/migrations/create_tables.sql`
 
 ### 2. Database Schema
 
