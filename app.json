@@ -18,16 +18,34 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "scheme": "gratis",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.gratis"
+      "bundleIdentifier": "com.yourcompany.gratis",
+      "associatedDomains": [
+        "applinks:qfngomisykdiyhsznzts.supabase.co"
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.yourcompany.gratis"
+      "package": "com.yourcompany.gratis",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "qfngomisykdiyhsznzts.supabase.co",
+              "pathPrefix": "/auth/v1/callback"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./src/assets/favicon.png"

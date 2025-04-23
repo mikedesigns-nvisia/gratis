@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../services/supabase';
+import { saveEntryToSupabase, syncEntries, deleteEntryFromSupabase } from '../services/supabaseStorage';
 
 // Custom UUID generator for React Native environments without crypto
 export const generateUUID = (): string => {
@@ -27,7 +29,15 @@ const STORAGE_KEYS = {
 };
 
 /**
- * Saves a gratitude entry to local storage
+ * Checks if the user is currently authenticated
+ */
+const isAuthenticated = async (): Promise<boolean> => {
+  const { data } = await supabase.auth.getSession();
+  return !!data.session;
+};
+
+/**
+ * Saves a gratitude entry to local storage and syncs with Supabase if possible
  */
 export const saveEntry = async (entry: Entry): Promise<void> => {
   try {
@@ -37,19 +47,28 @@ export const saveEntry = async (entry: Entry): Promise<void> => {
     // Check if entry already exists (for updates)
     const entryIndex = existingEntries.findIndex(e => e.id === entry.id);
     
+    const now = new Date().toISOString();
+    let entryToSave: Entry;
+    
     if (entryIndex >= 0) {
       // Update existing entry
-      existingEntries[entryIndex] = {
+      entryToSave = {
         ...entry,
-        updatedAt: new Date().toISOString(),
+        updatedAt: now,
+        // Preserve syncedWithServer status if it's explicitly set in the entry
+        syncedWithServer: entry.syncedWithServer !== undefined ? entry.syncedWithServer : false,
       };
+      existingEntries[entryIndex] = entryToSave;
     } else {
       // Add new entry
-      existingEntries.push({
+      entryToSave = {
         ...entry,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+        createdAt: now,
+        updatedAt: now,
+        // New entries aren't synced by default unless explicitly set
+        syncedWithServer: entry.syncedWithServer !== undefined ? entry.syncedWithServer : false,
+      };
+      existingEntries.push(entryToSave);
     }
     
     // Save entries back to storage
@@ -57,6 +76,31 @@ export const saveEntry = async (entry: Entry): Promise<void> => {
       STORAGE_KEYS.ENTRIES,
       JSON.stringify(existingEntries)
     );
+    
+    // Try to sync with Supabase if authenticated
+    try {
+      const authenticated = await isAuthenticated();
+      if (authenticated && !entryToSave.syncedWithServer) {
+        // Attempt to save to Supabase
+        await saveEntryToSupabase(entryToSave);
+        
+        // Update the entry to mark as synced
+        entryToSave.syncedWithServer = true;
+        
+        // Save the updated entry back to local storage
+        const updatedEntries = existingEntries.map(e => 
+          e.id === entryToSave.id ? entryToSave : e
+        );
+        
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.ENTRIES,
+          JSON.stringify(updatedEntries)
+        );
+      }
+    } catch (syncError) {
+      // Log the error but don't fail the save operation
+      console.warn('Failed to sync entry with Supabase:', syncError);
+    }
   } catch (error) {
     console.error('Error saving entry:', error);
     throw error;
@@ -65,9 +109,23 @@ export const saveEntry = async (entry: Entry): Promise<void> => {
 
 /**
  * Gets all gratitude entries from local storage
+ * Can optionally sync with Supabase first
  */
-export const getEntries = async (): Promise<Entry[]> => {
+export const getEntries = async (syncWithServer = false): Promise<Entry[]> => {
   try {
+    // If syncWithServer is true and user is authenticated, sync first
+    if (syncWithServer) {
+      try {
+        const authenticated = await isAuthenticated();
+        if (authenticated) {
+          await syncEntries();
+        }
+      } catch (syncError) {
+        console.warn('Failed to sync entries with Supabase:', syncError);
+      }
+    }
+    
+    // Get entries from local storage
     const entriesJson = await AsyncStorage.getItem(STORAGE_KEYS.ENTRIES);
     return entriesJson ? JSON.parse(entriesJson) : [];
   } catch (error) {
@@ -90,7 +148,7 @@ export const getEntryById = async (id: string): Promise<Entry | null> => {
 };
 
 /**
- * Deletes an entry from local storage
+ * Deletes an entry from local storage and from Supabase if authenticated
  */
 export const deleteEntry = async (id: string): Promise<void> => {
   try {
@@ -100,6 +158,17 @@ export const deleteEntry = async (id: string): Promise<void> => {
       STORAGE_KEYS.ENTRIES,
       JSON.stringify(filteredEntries)
     );
+    
+    // Try to delete from Supabase if authenticated
+    try {
+      const authenticated = await isAuthenticated();
+      if (authenticated) {
+        await deleteEntryFromSupabase(id);
+      }
+    } catch (syncError) {
+      // Log the error but don't fail the delete operation
+      console.warn('Failed to delete entry from Supabase:', syncError);
+    }
   } catch (error) {
     console.error('Error deleting entry:', error);
     throw error;
@@ -111,6 +180,16 @@ export const deleteEntry = async (id: string): Promise<void> => {
  */
 export const getEntriesByMonth = async (month: number, year: number): Promise<Entry[]> => {
   try {
+    // First sync with server if authenticated
+    try {
+      const authenticated = await isAuthenticated();
+      if (authenticated) {
+        await syncEntries();
+      }
+    } catch (syncError) {
+      console.warn('Failed to sync entries with Supabase:', syncError);
+    }
+    
     const entries = await getEntries();
     
     return entries.filter(entry => {

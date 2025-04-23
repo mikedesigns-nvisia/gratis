@@ -4,14 +4,17 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Text, LogBox } from 'react-native';
 import * as Font from 'expo-font';
 import { ThemeProvider } from './src/theme/provider';
+import { AuthProvider } from './src/context/AuthContext';
 import Navigation from './src/navigation';
 import 'react-native-url-polyfill/auto';
+import { startBackgroundSync } from './src/services/supabaseStorage';
 
 // Ignore specific warnings
 LogBox.ignoreLogs([
   'Reanimated 2',
   'Failed to get size for image',
   'Constants.manifest',
+  'The provided value for the auth option detectSessionInUrl is not supported for React-Native'
 ]);
 
 export default function App() {
@@ -60,13 +63,27 @@ export default function App() {
     );
   }
 
+  useEffect(() => {
+    // Start background sync when the app loads
+    startBackgroundSync(60000); // Sync every minute
+    
+    // Return cleanup function to stop background sync
+    return () => {
+      // Import is inside to avoid circular dependencies
+      const { stopBackgroundSync } = require('./src/services/supabaseStorage');
+      stopBackgroundSync();
+    };
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <StatusBar style="auto" />
-        <ErrorBoundary>
-          <Navigation />
-        </ErrorBoundary>
+        <AuthProvider>
+          <StatusBar style="auto" />
+          <ErrorBoundary>
+            <Navigation />
+          </ErrorBoundary>
+        </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
