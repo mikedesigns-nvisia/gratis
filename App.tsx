@@ -63,17 +63,24 @@ export default function App() {
     );
   }
 
+  // We need to ensure hooks are called in the same order on every render
+  // Moving this useEffect up to be consistent with the render order
+  const [syncSetup, setSyncSetup] = useState(false);
+  
   useEffect(() => {
     // Start background sync when the app loads
-    startBackgroundSync(60000); // Sync every minute
-    
-    // Return cleanup function to stop background sync
-    return () => {
-      // Import is inside to avoid circular dependencies
-      const { stopBackgroundSync } = require('./src/services/supabaseStorage');
-      stopBackgroundSync();
-    };
-  }, []);
+    if (fontsLoaded && !syncSetup) {
+      startBackgroundSync(60000); // Sync every minute
+      setSyncSetup(true);
+      
+      // Return cleanup function to stop background sync
+      return () => {
+        // Import is inside to avoid circular dependencies
+        const { stopBackgroundSync } = require('./src/services/supabaseStorage');
+        stopBackgroundSync();
+      };
+    }
+  }, [fontsLoaded, syncSetup]);
 
   return (
     <SafeAreaProvider>
@@ -100,7 +107,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: any) {
     console.log('Navigation error:', error);
     console.log('Error info:', errorInfo);
   }

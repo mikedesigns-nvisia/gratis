@@ -52,10 +52,13 @@ export const Navigation = () => {
     );
   }
   
+  // Determine initial route based on auth state and first launch
+  const initialRoute = isFirstLaunch ? "Splash" : user ? "Home" : "Auth";
+  
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={isFirstLaunch ? "Splash" : user ? "Home" : "Auth"}
+        initialRouteName={initialRoute}
         screenOptions={{
           headerShown: false,
           gestureEnabled: true,
@@ -65,13 +68,9 @@ export const Navigation = () => {
         {/* Always available screens */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         
-        {/* Auth flow */}
-        {!user ? (
-          <>
-            <Stack.Screen name="Auth" component={AuthScreen} />
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          </>
-        ) : null}
+        {/* Auth screens - always defined but conditionally used */}
+        <Stack.Screen name="Auth" component={AuthScreen} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         
         {/* Main app screens */}
         <Stack.Screen name="Home" component={HomeScreen} />

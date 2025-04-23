@@ -2,7 +2,10 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "lib": ["dom", "esnext"],
+    "lib": [
+      "dom",
+      "esnext"
+    ],
     "jsx": "react-native",
     "noEmit": true,
     "isolatedModules": true,
@@ -14,10 +17,25 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["src/*"]
+      "*": [
+        "src/*"
+      ]
     },
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ]
   },
-  "include": ["src", "App.tsx"],
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "*.d.ts"]
+  "include": [
+    "src",
+    "App.tsx",
+    "src/types/custom.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "*.d.ts"
+  ],
+  "extends": "expo/tsconfig.base"
 }
