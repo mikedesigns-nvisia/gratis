@@ -20,6 +20,7 @@ LogBox.ignoreLogs([
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [fontsError, setFontsError] = useState<Error | null>(null);
+  const [syncSetup, setSyncSetup] = useState(false);
 
   useEffect(() => {
     // Add a delay before attempting to load fonts (helps with some devices)
@@ -63,10 +64,6 @@ export default function App() {
     );
   }
 
-  // We need to ensure hooks are called in the same order on every render
-  // Moving this useEffect up to be consistent with the render order
-  const [syncSetup, setSyncSetup] = useState(false);
-  
   useEffect(() => {
     // Start background sync when the app loads
     if (fontsLoaded && !syncSetup) {
